@@ -1,10 +1,30 @@
-import {  Body,  Controller,  Delete,  Get,  Param,  ParseIntPipe,  Patch,  Post,  Put,} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Put,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { ParamId } from 'src/decorators/param-id.decorator';
 import { UpdatePutUserDTO } from './dto/update-user.dto';
 import { UpdatePatchUserDTO } from './dto/update-patch-user.dto';
+import { LogInterceptor } from './interceptors/LogInterceptor';
+import { Roles } from 'src/decorators/roles.decorator';
+import { Role } from 'src/enums/role.enum';
+import { RoleGuard } from 'src/guards/role.guard';
+import { AuthGuard } from 'src/guards/auth.guard';
 
+@Roles(Role.Admin)
+@UseGuards(AuthGuard, RoleGuard)
+@UseInterceptors(LogInterceptor)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -21,6 +41,7 @@ export class UserController {
 
   @Get(':id')
   async showById(@ParamId() id: number) {
+    console.log({ id });
     return this.userService.showById(id);
   }
 
